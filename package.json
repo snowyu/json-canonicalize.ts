@@ -1,6 +1,6 @@
 {
 	"name": "json-canonicalize",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "JSON canonicalize function ",
 	"keywords": [
 		"json",
@@ -79,8 +79,7 @@
 			"git add"
 		]
 	},
-	"peerDependencies": {
-	},
+	"peerDependencies": {},
 	"dependencies": {},
 	"devDependencies": {
 		"@commitlint/cli": "~8.2.0",
