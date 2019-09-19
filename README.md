@@ -51,7 +51,9 @@ canonicalize(obj}
 canonicalizeEx(obj, {exclude:['num', 'dt']}
 
 // add canonicalize to JSON directly.
-import from 'json-canonicalize/global';
+// which means
+// JSON.canonicalize = canonicalize;
+import from 'json-canonicalize/src/global';
 JSON.canonicalize(obj}
 ```
 
