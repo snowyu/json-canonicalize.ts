@@ -13,7 +13,13 @@
 		"signature",
 		"signing",
 		"crypto"
-	],
+  ],
+  "files": [
+    "src",
+    "bundles",
+    "esm*",
+    "types"
+  ],
 	"main": "./bundles/index.umd.js",
 	"module": "./esm5/index.js",
 	"es2015": "./esm2015/index.js",
