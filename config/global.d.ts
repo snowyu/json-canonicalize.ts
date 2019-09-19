@@ -118,19 +118,6 @@ declare module 'gzip-size' {
   export = gzipSize
 }
 
-declare module 'brotli-size' {
-  type Input = string | Buffer
-
-  namespace brotliSize {
-    function sync(input: Input): number
-    function stream(): import('stream').PassThrough
-  }
-
-  function brotliSize(input: Input): Promise<number>
-
-  export = brotliSize
-}
-
 declare module 'pretty-bytes' {
   type Options = {
     /**
