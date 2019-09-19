@@ -134,3 +134,21 @@ declare module 'pretty-bytes' {
 
   export = prettyBytes
 }
+
+declare module 'copy-dir' {
+  type Options = {
+    filter?: (stat, filename, dir?, basename?) => boolean
+  }
+
+  function copydir(
+    from: string,
+    target: string,
+    options?: Options,
+    callback: Function
+  )
+  function copydirSync(from: string, target: string, options?: Options)
+
+  copydir.sync = copydirSync
+
+  export = copydir
+}

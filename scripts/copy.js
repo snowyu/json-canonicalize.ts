@@ -5,6 +5,7 @@
  * 👉 This file should not use any 3rd party dependency
  */
 const { writeFileSync, copyFileSync, statSync } = require('fs')
+const copydir = require('copy-dir')
 const { resolve, basename } = require('path')
 const packageJson = require('../package.json')
 
@@ -15,9 +16,13 @@ function main() {
   const distPath = resolve(projectRoot, 'dist')
   const distPackageJson = createDistPackageJson(packageJson)
 
-  const cpFiles = ['README.md', 'CHANGELOG.md', 'LICENSE.md', '.npmignore'].map(
-    (file) => resolve(projectRoot, file)
-  )
+  const cpFiles = [
+    'README.md',
+    'CHANGELOG.md',
+    'LICENSE.md',
+    '.npmignore',
+    'src',
+  ].map((file) => resolve(projectRoot, file))
 
   cp(cpFiles, distPath)
 
@@ -33,20 +38,20 @@ function cp(source, target) {
   const isDir = statSync(target).isDirectory()
 
   if (isDir) {
-    if (!Array.isArray(source)) {
-      throw new Error(
-        'if <target> is directory you need to provide source as an array'
-      )
+    if (Array.isArray(source)) {
+      source.forEach((file) => {
+        if (statSync(file).isDirectory()) {
+          copydir.sync(file, resolve(target, basename(file)))
+        } else {
+          copyFileSync(file, resolve(target, basename(file)))
+        }
+      })
+    } else {
+      copydir.sync(source, target)
     }
-
-    source.forEach((file) =>
-      copyFileSync(file, resolve(target, basename(file)))
-    )
-
-    return
+  } else {
+    copyFileSync(/** @type {string} */ (source), target)
   }
-
-  copyFileSync(/** @type {string} */ (source), target)
 }
 
 /**
