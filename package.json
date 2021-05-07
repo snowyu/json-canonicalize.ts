@@ -20,10 +20,10 @@
 		"esm*",
 		"types"
 	],
-	"main": "./dist/bundles/index.umd.js",
-	"module": "./dist/esm5/index.js",
-	"es2015": "./dist/esm2015/index.js",
-	"typings": "./dist/types/index.d.ts",
+	"main": "./bundles/index.umd.js",
+	"module": "./esm5/index.js",
+	"es2015": "./esm2015/index.js",
+	"typings": "./types/index.d.ts",
 	"sideEffects": false,
 	"repository": {
 		"type": "git",
