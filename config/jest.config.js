@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * @type {Partial<jest.InitialOptions>}
  */
