@@ -54,7 +54,7 @@ canonicalizeEx(obj, {exclude:['num', 'dt']}
 // which means
 // JSON.canonicalize = canonicalize;
 import from 'json-canonicalize/src/global';
-JSON.canonicalize(obj}
+JSON.canonicalize(obj)
 ```
 
 ## 🥂 License
