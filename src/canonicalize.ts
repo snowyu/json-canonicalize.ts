@@ -29,6 +29,7 @@ export function canonicalize(obj: any) {
           buffer += ','
         }
         next = true
+        if (element === undefined) {element = null}
         /////////////////////////////////////////
         // Array element - Recursive expansion //
         /////////////////////////////////////////
@@ -40,7 +41,7 @@ export function canonicalize(obj: any) {
       // Object - Sort properties before serializing //
       /////////////////////////////////////////////////
       buffer += '{'
-      const vKeys = Object.keys(object).sort()
+      const vKeys = Object.keys(object).filter((k)=> object[k] !== undefined).sort()
       vKeys.forEach((property, index) => addProp(object, property, index))
       buffer += '}'
     }

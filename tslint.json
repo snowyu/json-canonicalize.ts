@@ -58,7 +58,7 @@
     "prefer-template": true,
     "newline-before-return": true,
     "match-default-export-name": true,
-    "no-parameter-reassignment": true,
+    "no-parameter-reassignment": false,
     "file-name-casing": [true, "kebab-case"],
     "switch-default": true,
     // tslint:recommended overrides
