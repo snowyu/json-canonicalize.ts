@@ -17,7 +17,8 @@
 	"files": [
 		"src",
 		"bundles",
-		"esm*",
+		"esm5",
+		"esm2015",
 		"types"
 	],
 	"main": "./bundles/index.umd.js",
