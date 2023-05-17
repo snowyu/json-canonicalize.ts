@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.0.6](https://github.com/snowyu/json-canonicalize.ts/compare/v1.0.5...v1.0.6) (2023-05-17)
+
+
+### Bug Fixes
+
+* **build:** References to non-existent files in package.json. fixed [#22](https://github.com/snowyu/json-canonicalize.ts/issues/22) ([46da0cf](https://github.com/snowyu/json-canonicalize.ts/commit/46da0cfa8ddfa725e0c5d4a7415258a0537c6284))
+
 ### [1.0.5](https://github.com/snowyu/json-canonicalize.ts/compare/v1.0.4...v1.0.5) (2023-04-28)
 
 
