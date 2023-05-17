@@ -60,7 +60,7 @@
 		"release": "npx standard-version",
 		"postrelease": "node scripts/copy && node scripts/build && npm run release:github && npm run release:npm",
 		"release:github": "git push --no-verify --follow-tags origin master",
-		"release:npm": "npm publish dist",
+		"release:npm": "pushd dist;npm publish;popd",
 		"release:preflight": "npm pack ./dist --dry-run",
 		"size": "node scripts/file-size ./dist/bundles/index.umd.min.js ./dist/bundles/index.esm.min.js"
 	},
