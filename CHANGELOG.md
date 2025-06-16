@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.1.0](https://github.com/snowyu/json-canonicalize.ts/compare/v1.0.6...v1.1.0) (2025-06-16)
+
+
+### Features
+
+* add an optional allowCircular option to canonicalize ([6dbb3a4](https://github.com/snowyu/json-canonicalize.ts/commit/6dbb3a4bada8d85dfb704d92793b15dd5aed1915))
+
+
+### Bug Fixes
+
+* **tslint:** follow tslint format ([a49cd27](https://github.com/snowyu/json-canonicalize.ts/commit/a49cd279afb255dd346501752d168522ec815716))
+
 ### [1.0.6](https://github.com/snowyu/json-canonicalize.ts/compare/v1.0.5...v1.0.6) (2023-05-17)
 
 
