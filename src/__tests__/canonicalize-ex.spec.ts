@@ -88,7 +88,6 @@ describe('json canonicalize ex', () => {
     }
     obj.cir = obj;
     const result = canonicalize(obj, {allowCircular: true})
-    console.log('🚀 ~ file: canonicalize-ex.spec.ts:91 ~ result:', result)
     expect(result).toEqual(
       '{"arr":[56,"a","12",{"a":123,"t":"455A"}],"cir":"[Circular]","dt":"2018-12-17T01:08:19.719Z","num":47734.12,"text":undefined}'
     )

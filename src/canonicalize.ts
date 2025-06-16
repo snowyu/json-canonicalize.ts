@@ -29,6 +29,7 @@ export function canonicalize(obj: any, allowCircular?: boolean) {
           throw new Error('Circular reference detected')
         }
         buffer += '"[Circular]"'
+
         return
       }
       visited.set(object, true)
@@ -56,6 +57,7 @@ export function canonicalize(obj: any, allowCircular?: boolean) {
           throw new Error('Circular reference detected')
         }
         buffer += '"[Circular]"'
+
         return
       }
       visited.set(object, true)
