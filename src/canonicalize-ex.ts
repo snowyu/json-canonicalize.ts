@@ -1,6 +1,7 @@
 export interface IOptions {
   exclude?: string | string[]
   include?: string[]
+  allowCircular?: boolean
 }
 
 export function canonicalizeEx(obj: any, options?: IOptions) {
@@ -12,6 +13,8 @@ export function canonicalizeEx(obj: any, options?: IOptions) {
   }
   if (vInclude) vInclude.sort()
 
+  const visited = new WeakMap<object, boolean>()
+  const allowCircular = options && options?.allowCircular
   serialize(obj)
 
   return buffer
@@ -33,6 +36,15 @@ export function canonicalizeEx(obj: any, options?: IOptions) {
       /////////////////////////////////////////////////
       // Array - Maintain element order              //
       /////////////////////////////////////////////////
+      if (visited.has(object)) {
+        if (!allowCircular) {
+          throw new Error('Circular reference detected')
+        }
+        buffer += '"[Circular]"'
+        return
+      }
+      visited.set(object, true)
+
       buffer += '['
       let next = false
       object.forEach((element) => {
@@ -50,6 +62,15 @@ export function canonicalizeEx(obj: any, options?: IOptions) {
       /////////////////////////////////////////////////
       // Object - Sort properties before serializing //
       /////////////////////////////////////////////////
+      if (visited.has(object)) {
+        if (!allowCircular) {
+          throw new Error('Circular reference detected')
+        }
+        buffer += '"[Circular]"'
+        return
+      }
+      visited.set(object, true)
+
       buffer += '{'
       if (!parent && vInclude) {
         vInclude.forEach((property, index) => {

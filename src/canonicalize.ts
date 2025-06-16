@@ -1,5 +1,7 @@
-export function canonicalize(obj: any) {
+export function canonicalize(obj: any, allowCircular?: boolean) {
   let buffer = ''
+
+  const visited = new WeakMap<object, boolean>()
 
   serialize(obj)
 
@@ -22,6 +24,15 @@ export function canonicalize(obj: any) {
       /////////////////////////////////////////////////
       // Array - Maintain element order              //
       /////////////////////////////////////////////////
+      if (visited.has(object)) {
+        if (!allowCircular) {
+          throw new Error('Circular reference detected')
+        }
+        buffer += '"[Circular]"'
+        return
+      }
+      visited.set(object, true)
+
       buffer += '['
       let next = false
       object.forEach((element) => {
@@ -40,6 +51,15 @@ export function canonicalize(obj: any) {
       /////////////////////////////////////////////////
       // Object - Sort properties before serializing //
       /////////////////////////////////////////////////
+      if (visited.has(object)) {
+        if (!allowCircular) {
+          throw new Error('Circular reference detected')
+        }
+        buffer += '"[Circular]"'
+        return
+      }
+      visited.set(object, true)
+
       buffer += '{'
       const vKeys = Object.keys(object).filter((k)=> object[k] !== undefined).sort()
       vKeys.forEach((property, index) => addProp(object, property, index))

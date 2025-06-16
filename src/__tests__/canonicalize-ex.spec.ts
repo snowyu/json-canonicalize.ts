@@ -48,4 +48,50 @@ describe('json canonicalize ex', () => {
       '{"arr":[56,"a","12",{"a":123,"t":"455A"}],"text":"你好"}'
     )
   })
+
+
+  it('should throw error when canonicalize array item circular ref', () => {
+    const obj: any = {
+      arr: [undefined, null, 56, 'a', '12', { t: '455A', a: 123 }],
+    }
+    obj.arr.push(obj.arr);
+    expect(() => canonicalize(obj)).toThrowError('Circular reference detected')
+  })
+
+  it('should allow canonicalize array item circular ref', () => {
+    const obj: any = {
+      arr: [undefined, null, 56, 'a', '12', { t: '455A', a: 123 }],
+    }
+    obj.arr.push(obj.arr);
+    expect(canonicalize(obj, {allowCircular: true})).toEqual(
+      '{"arr":[undefined,null,56,"a","12",{"a":123,"t":"455A"},"[Circular]"]}'
+    )
+  })
+
+  it('should throw error when canonicalize obj item circular ref', () => {
+    const obj: any = {
+      text: undefined,
+      num: 47734.12,
+      dt: new Date('2018-12-17T01:08:19.719Z'),
+      arr: [56, 'a', '12', { t: '455A', a: 123 }],
+    }
+    obj.cir = obj;
+    expect(() => canonicalize(obj)).toThrowError('Circular reference detected')
+  })
+
+  it('should allow canonicalize obj item circular ref', () => {
+    const obj: any = {
+      text: undefined,
+      num: 47734.12,
+      dt: new Date('2018-12-17T01:08:19.719Z'),
+      arr: [56, 'a', '12', { t: '455A', a: 123 }],
+    }
+    obj.cir = obj;
+    const result = canonicalize(obj, {allowCircular: true})
+    console.log('🚀 ~ file: canonicalize-ex.spec.ts:91 ~ result:', result)
+    expect(result).toEqual(
+      '{"arr":[56,"a","12",{"a":123,"t":"455A"}],"cir":"[Circular]","dt":"2018-12-17T01:08:19.719Z","num":47734.12,"text":undefined}'
+    )
+
+  })
 })
