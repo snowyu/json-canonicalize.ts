@@ -93,4 +93,31 @@ describe('json canonicalize ex', () => {
     )
 
   })
+
+  it('should not treat two references to the same sub-object as a circular reference', () => {
+    const sharedObject = { key: 'value' };
+    const obj = {
+      a: sharedObject,
+      b: sharedObject
+    };
+    expect(canonicalize(obj)).toEqual('{"a":{"key":"value"},"b":{"key":"value"}}');
+  });
+
+  it('should not treat two references to the same sub-object in an array as a circular reference', () => {
+    const sharedObject = { key: 'value' };
+    const obj = {
+      arr: [sharedObject, sharedObject]
+    };
+    expect(canonicalize(obj)).toEqual('{"arr":[{"key":"value"},{"key":"value"}]}');
+  });
+
+  it('should not treat two references to the same sub-array as a circular reference', () => {
+    const sharedArray = [1, 2];
+    const obj = {
+      a: sharedArray,
+      b: sharedArray
+    };
+    expect(canonicalize(obj)).toEqual('{"a":[1,2],"b":[1,2]}');
+  });
+
 })

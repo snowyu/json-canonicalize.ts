@@ -13,13 +13,13 @@ export function canonicalizeEx(obj: any, options?: IOptions) {
   }
   if (vInclude) vInclude.sort()
 
-  const visited = new WeakMap<object, boolean>()
+  const visited = new WeakMap<object, string>()
   const allowCircular = options && options?.allowCircular
-  serialize(obj)
+  serialize(obj, '')
 
   return buffer
 
-  function serialize(object: any, parent?: object) {
+  function serialize(object: any, path: string) {
     if (
       object === null ||
       typeof object !== 'object' ||
@@ -36,19 +36,22 @@ export function canonicalizeEx(obj: any, options?: IOptions) {
       /////////////////////////////////////////////////
       // Array - Maintain element order              //
       /////////////////////////////////////////////////
-      if (visited.has(object)) {
-        if (!allowCircular) {
-          throw new Error('Circular reference detected')
-        }
-        buffer += '"[Circular]"'
+      const visitedPath = visited.get(object)
+      if (visitedPath !== undefined) {
+        if (path.startsWith(visitedPath)) {
+          if (!allowCircular) {
+            throw new Error('Circular reference detected')
+          }
+          buffer += '"[Circular]"'
 
-        return
+          return
+        }
       }
-      visited.set(object, true)
+      visited.set(object, path)
 
       buffer += '['
       let next = false
-      object.forEach((element) => {
+      object.forEach((element, index) => {
         if (next) {
           buffer += ','
         }
@@ -56,38 +59,41 @@ export function canonicalizeEx(obj: any, options?: IOptions) {
         /////////////////////////////////////////
         // Array element - Recursive expansion //
         /////////////////////////////////////////
-        serialize(element, object)
+        serialize(element, `${path}[${index}]`)
       })
       buffer += ']'
     } else {
       /////////////////////////////////////////////////
       // Object - Sort properties before serializing //
       /////////////////////////////////////////////////
-      if (visited.has(object)) {
-        if (!allowCircular) {
-          throw new Error('Circular reference detected')
-        }
-        buffer += '"[Circular]"'
+      const visitedPath = visited.get(object)
+      if (visitedPath !== undefined) {
+        if (path.startsWith(visitedPath)) {
+          if (!allowCircular) {
+            throw new Error('Circular reference detected')
+          }
+          buffer += '"[Circular]"'
 
-        return
+          return
+        }
       }
-      visited.set(object, true)
+      visited.set(object, path)
 
       buffer += '{'
-      if (!parent && vInclude) {
+      if (path === '' && vInclude) {
         vInclude.forEach((property, index) => {
           if (!object.hasOwnProperty(property)) return
-          addProp(object, property, index)
+          addProp(object, property, index, path)
         })
       } else {
         const vKeys = Object.keys(object).sort()
-        vKeys.forEach((property, index) => addProp(object, property, index))
+        vKeys.forEach((property, index) => addProp(object, property, index, path))
       }
       buffer += '}'
     }
   }
 
-  function addProp(object: any, property: string, index: number) {
+  function addProp(object: any, property: string, index: number, path: string) {
     if (vExclude && vExclude.length) {
       for (const v of vExclude) {
         if (v === property) return
@@ -104,6 +110,6 @@ export function canonicalizeEx(obj: any, options?: IOptions) {
     //////////////////////////////////////////
     // Property value - Recursive expansion //
     //////////////////////////////////////////
-    serialize(object[property], object)
+    serialize(object[property], `${path}.${property}`)
   }
 }
