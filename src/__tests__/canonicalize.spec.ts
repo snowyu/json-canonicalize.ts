@@ -81,6 +81,21 @@ describe('json canonicalize', () => {
 
   })
 
+  it('should allow canonicalize obj item circular ref2', () => {
+    const obj: any = {
+      text: undefined,
+      num: 47734.12,
+      dt: new Date('2018-12-17T01:08:19.719Z'),
+      arr: [56, 'a', '12', { t: '455A', a: 123 }],
+    }
+    obj.cir = obj;
+    obj.arr.push(obj)
+    expect(canonicalize(obj, true)).toEqual(
+      '{"arr":[56,"a","12",{"a":123,"t":"455A"},"[Circular]"],"cir":"[Circular]","dt":"2018-12-17T01:08:19.719Z","num":47734.12}'
+    )
+
+  })
+
   it('should not treat two references to the same sub-object as a circular reference', () => {
     const sharedObject = { key: 'value' };
     const obj = {
@@ -105,6 +120,15 @@ describe('json canonicalize', () => {
       b: sharedArray
     };
     expect(canonicalize(obj)).toEqual('{"a":[1,2],"b":[1,2]}');
+  });
+
+  it('should not treat two references to the same sub-array as a circular reference2', () => {
+    const sharedArray = [1, 2];
+    const obj = {
+      a: [sharedArray],
+      b: sharedArray
+    };
+    expect(canonicalize(obj)).toEqual('{"a":[[1,2]],"b":[1,2]}');
   });
 
 })
