@@ -18,8 +18,6 @@ export function canonicalize(obj: any, allowCircular?: boolean) {
       /////////////////////////////////////////////////
       buffer += JSON.stringify(object)
 
-      // } else if (object instanceof Date) {
-      //   buffer += JSON.stringify(object);
     } else if (Array.isArray(object)) {
       /////////////////////////////////////////////////
       // Array - Maintain element order              //
