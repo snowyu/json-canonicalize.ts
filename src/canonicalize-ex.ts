@@ -1,113 +1,17 @@
-export interface IOptions {
-  exclude?: string | string[]
-  include?: string[]
-  allowCircular?: boolean
-}
+import { _serialize, ISerializeOptions } from './serializer';
 
-export function canonicalizeEx(obj: any, options?: IOptions) {
-  let buffer = ''
-  const vInclude = options && options.include
-  let vExclude = options && options.exclude
-  if (vExclude) {
-    if (typeof vExclude === 'string') vExclude = [vExclude]
-  }
-  if (vInclude) vInclude.sort()
-
-  const visited = new WeakMap<object, string>()
-  const allowCircular = options && options?.allowCircular
-  serialize(obj, '')
-
-  return buffer
-
-  function serialize(object: any, path: string) {
-    if (
-      object === null ||
-      typeof object !== 'object' ||
-      object.toJSON != null
-    ) {
-      /////////////////////////////////////////////////
-      // Primitive data type - Use ES6/JSON          //
-      /////////////////////////////////////////////////
-      buffer += JSON.stringify(object)
-
-    } else if (Array.isArray(object)) {
-      /////////////////////////////////////////////////
-      // Array - Maintain element order              //
-      /////////////////////////////////////////////////
-      const visitedPath = visited.get(object)
-      if (visitedPath !== undefined) {
-        if (path.startsWith(visitedPath)) {
-          if (!allowCircular) {
-            throw new Error('Circular reference detected')
-          }
-          buffer += '"[Circular]"'
-
-          return
-        }
-      }
-      visited.set(object, path)
-
-      buffer += '['
-      let next = false
-      object.forEach((element, index) => {
-        if (next) {
-          buffer += ','
-        }
-        next = true
-        /////////////////////////////////////////
-        // Array element - Recursive expansion //
-        /////////////////////////////////////////
-        serialize(element, `${path}[${index}]`)
-      })
-      buffer += ']'
-    } else {
-      /////////////////////////////////////////////////
-      // Object - Sort properties before serializing //
-      /////////////////////////////////////////////////
-      const visitedPath = visited.get(object)
-      if (visitedPath !== undefined) {
-        if (path.startsWith(visitedPath)) {
-          if (!allowCircular) {
-            throw new Error('Circular reference detected')
-          }
-          buffer += '"[Circular]"'
-
-          return
-        }
-      }
-      visited.set(object, path)
-
-      buffer += '{'
-      if (path === '' && vInclude) {
-        vInclude.forEach((property, index) => {
-          if (!object.hasOwnProperty(property)) return
-          addProp(object, property, index, path)
-        })
-      } else {
-        const vKeys = Object.keys(object).sort()
-        vKeys.forEach((property, index) => addProp(object, property, index, path))
-      }
-      buffer += '}'
-    }
-  }
-
-  function addProp(object: any, property: string, index: number, path: string) {
-    if (vExclude && vExclude.length) {
-      for (const v of vExclude) {
-        if (v === property) return
-      }
-    }
-    if (index > 0) {
-      buffer += ','
-    }
-    ///////////////////////////////////////////////
-    // Property names are strings - Use ES6/JSON //
-    ///////////////////////////////////////////////
-    buffer += JSON.stringify(property)
-    buffer += ':'
-    //////////////////////////////////////////
-    // Property value - Recursive expansion //
-    //////////////////////////////////////////
-    serialize(object[property], `${path}.${property}`)
-  }
+/**
+ * The extended canonicalization function, offering more granular control over the serialization process.
+ *
+ * @param obj The JavaScript object to canonicalize.
+ * @param options An object with the following properties:
+ *  - `allowCircular` (boolean, optional): Same as in `canonicalize`.
+ *  - `filterUndefined` (boolean, optional): If `true`, `undefined` values in objects will be filtered out. Defaults to `true`.
+ *  - `undefinedInArrayToNull` (boolean, optional): If `true`, `undefined` values in arrays will be converted to `null`. Defaults to `true`.
+ *  - `include` (string[], optional): An array of property names to include in the canonicalization.
+ *  - `exclude` (string[], optional): An array of property names to exclude from the canonicalization.
+ * @returns The canonical string representation of the object.
+ */
+export function canonicalizeEx(obj: any, options?: ISerializeOptions) {
+  return _serialize(obj, options);
 }
