@@ -46,6 +46,7 @@ export function _serialize(obj: any, options?: ISerializeOptions) {
             throw new Error('Circular reference detected');
           }
           buffer += '"[Circular]"';
+
           return;
         }
       }

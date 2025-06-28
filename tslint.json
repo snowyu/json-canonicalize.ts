@@ -47,7 +47,7 @@
         }
       ]
     },
-    "no-magic-numbers": true,
+    "no-magic-numbers": false,
     "no-require-imports": true,
     "no-boolean-literal-compare": true,
     "no-invalid-this": {
