@@ -25,6 +25,7 @@ and through a platform independent property sorting scheme.
 
 - Working document: https://cyberphone.github.io/ietf-json-canon
 - Published IETF Draft: https://tools.ietf.org/html/draft-rundgren-json-canonicalization-scheme-05
+- Published RFC 8785: https://www.rfc-editor.org/rfc/rfc8785
 
 ## ✨ Features
 
@@ -33,6 +34,19 @@ The JSON Canonicalization Scheme concept in a nutshell:
 - Serialization of primitive JSON data types using methods compatible with ECMAScript's `JSON.stringify()`
 - Lexicographic sorting of JSON `Object` properties in a _recursive_ process
 - JSON `Array` data is also subject to canonicalization, _but element order remains untouched_
+
+## RFC 8785 Compatibility
+
+This implementation is compatible with JCS / RFC 8785, with a couple of key differences in the default `canonicalize` function:
+
+- **Handling of `undefined` in arrays:** When a value in an array is `undefined`, the `canonicalize` function treats it as `null`. RFC 8785 specifies that it should be treated as `undefined`, which can lead to different outputs.
+- **Recursive References:** This implementation supports recursive object references, which is an enhancement not covered by the standard.
+
+To be fully compatible with RFC 8785, you can use the `canonicalizeEx` function with the `undefinedInArrayToNull` option set to `false`:
+
+```ts
+canonicalizeEx(obj, { undefinedInArrayToNull: false });
+```
 
 ## 🔧 Installation
 
@@ -46,9 +60,9 @@ Let's demonstrate simple usage with ... example:
 
 ```ts
 import { canonicalize, canonicalizeEx } from 'json-canonicalize';
-canonicalize(obj}
+canonicalize(obj)
 // Add `include` and `exclude` options to `canonicalizeEx`.
-canonicalizeEx(obj, {exclude:['num', 'dt']}
+canonicalizeEx(obj, {exclude:['num', 'dt']})
 
 // add canonicalize to JSON directly.
 // which means
@@ -56,6 +70,27 @@ canonicalizeEx(obj, {exclude:['num', 'dt']}
 import from 'json-canonicalize/src/global';
 JSON.canonicalize(obj)
 ```
+
+## API
+
+### `canonicalize(obj, allowCircular)`
+
+This is the main function for JSON canonicalization. It takes a JavaScript object and returns its canonical string representation.
+
+-   `obj` (any): The JavaScript object to canonicalize.
+-   `allowCircular` (boolean, optional): If `true`, the function will handle circular references in the object by replacing them with `null`. Defaults to `false`.
+
+### `canonicalizeEx(obj, options)`
+
+This is the extended canonicalization function, offering more granular control over the serialization process.
+
+-   `obj` (any): The JavaScript object to canonicalize.
+-   `options` (ISerializeOptions, optional): An object with the following properties:
+    -   `allowCircular` (boolean, optional): Same as in `canonicalize`.
+    -   `filterUndefined` (boolean, optional): If `true`, `undefined` values in objects will be filtered out. Defaults to `true`.
+    -   `undefinedInArrayToNull` (boolean, optional): If `true`, `undefined` values in arrays will be converted to `null`. Defaults to `true`.
+    -   `include` (string[], optional): An array of property names to include in the canonicalization.
+    -   `exclude` (string[], optional): An array of property names to exclude from the canonicalization.
 
 ## 🥂 License
 
