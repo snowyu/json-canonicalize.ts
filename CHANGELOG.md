@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.2.0](https://github.com/snowyu/json-canonicalize.ts/compare/v1.1.1...v1.2.0) (2025-06-28)
+
+
+### Features
+
+* extract internal serializer function from canonicalizeEx ([ce986b3](https://github.com/snowyu/json-canonicalize.ts/commit/ce986b3378f2f3767dd330547e881f473622a41b))
+
+
+### Bug Fixes
+
+* tslint ([e5a9be1](https://github.com/snowyu/json-canonicalize.ts/commit/e5a9be1beb24f20c6086fe6be484815843a3a07b))
+
 ### [1.1.1](https://github.com/snowyu/json-canonicalize.ts/compare/v1.1.0...v1.1.1) (2025-06-27)
 
 
