@@ -55,7 +55,7 @@ describe('json canonicalize ex', () => {
       arr: [undefined, null, 56, 'a', '12', { t: '455A', a: 123 }],
     }
     obj.arr.push(obj.arr);
-    expect(() => canonicalize(obj)).toThrowError('Circular reference detected')
+    expect(() => canonicalize(obj)).toThrow('Circular reference detected')
   })
 
   it('should allow canonicalize array item circular ref', () => {
@@ -76,7 +76,7 @@ describe('json canonicalize ex', () => {
       arr: [56, 'a', '12', { t: '455A', a: 123 }],
     }
     obj.cir = obj;
-    expect(() => canonicalize(obj)).toThrowError('Circular reference detected')
+    expect(() => canonicalize(obj)).toThrow('Circular reference detected')
   })
 
   it('should allow canonicalize obj item circular ref', () => {
