@@ -19,15 +19,13 @@
     "outDir": "dist/esm5",
     "resolveJsonModule": true,
     "importHelpers": true,
-    "plugins": [
-      {
-        "name": "typescript-tslint-plugin",
-        "alwaysShowRuleFailuresAsWarnings": false
-      }
-    ]
+    "skipLibCheck": true,
   },
   "include": [
     "./src"
+  ],
+  "exclude": [
+    "node_modules"
   ],
   "compileOnSave": false
 }

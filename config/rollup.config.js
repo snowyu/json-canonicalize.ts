@@ -67,6 +67,7 @@ const plugins = /** @type {Plugin[]} */ ([
   // properly set process.env.NODE_ENV within `./environment.ts`
   replace({
     exclude: 'node_modules/**',
+    preventAssignment: true,
     'process.env.NODE_ENV': JSON.stringify(env),
   }),
 ])
@@ -76,8 +77,9 @@ const plugins = /** @type {Plugin[]} */ ([
  */
 const CommonConfig = {
   input: {},
-  output: {},
-  inlineDynamicImports: true,
+  output: {
+    inlineDynamicImports: true,
+  },
   // Indicate here external modules you don't wanna include in your bundle (i.e.: 'lodash')
   external,
 }
