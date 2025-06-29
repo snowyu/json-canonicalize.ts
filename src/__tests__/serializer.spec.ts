@@ -40,7 +40,25 @@ describe('_serialize', () => {
   it('should handle circular references when allowCircular is true', () => {
     const obj: any = {};
     obj.a = obj;
-    expect(_serialize(obj, { allowCircular: true })).toBe('{"a":"[Circular]"}');
+    expect(_serialize(obj, { allowCircular: true })).toBe('{"a":"[Circular:$]"}');
+  });
+
+  it('should handle circular references with path when allowCircular is true', () => {
+    const obj: any = { b: {} };
+    obj.b.a = obj;
+    expect(_serialize(obj, { allowCircular: true })).toBe('{"b":{"a":"[Circular:$]"}}');
+  });
+
+  it('should handle deeper circular references with path when allowCircular is true', () => {
+    const obj: any = { a: { b: {} } };
+    obj.a.b.c = obj.a;
+    expect(_serialize(obj, { allowCircular: true })).toBe('{"a":{"b":{"c":"[Circular:$.a]"}}}');
+  });
+
+  it('should handle circular references in arrays when allowCircular is true', () => {
+    const arr: any = [1, 2];
+    arr.push(arr);
+    expect(_serialize(arr, { allowCircular: true })).toBe('[1,2,"[Circular:$]"]');
   });
 
   it('should include specified properties when include option is used', () => {
@@ -68,7 +86,7 @@ describe('_serialize', () => {
       exclude: 'f',
       include: ['a', 'c', 'g', 'd'],
     };
-    expect(_serialize(obj, options)).toBe('{"a":1,"c":[4,null],"d":{"e":5},"g":"[Circular]"}');
+    expect(_serialize(obj, options)).toBe('{"a":1,"c":[4,null],"d":{"e":5},"g":"[Circular:$]"}');
   });
 
   it('should handle objects with toJSON method', () => {

@@ -6,6 +6,8 @@ export interface ISerializeOptions {
   undefinedInArrayToNull?: boolean;
 }
 
+const CircularRootPathName = '$';
+
 export function _serialize(obj: any, options?: ISerializeOptions) {
   let buffer = '';
   const vInclude = options && options.include;
@@ -20,7 +22,7 @@ export function _serialize(obj: any, options?: ISerializeOptions) {
   const filterUndefined = options && options.filterUndefined;
   const undefinedInArrayToNull = options && options.undefinedInArrayToNull;
 
-  serialize(obj, '');
+  serialize(obj, CircularRootPathName);
 
   return buffer;
 
@@ -45,7 +47,7 @@ export function _serialize(obj: any, options?: ISerializeOptions) {
           if (!allowCircular) {
             throw new Error('Circular reference detected');
           }
-          buffer += '"[Circular]"';
+          buffer += '"[Circular:' + visitedPath + ']"';
 
           return;
         }
@@ -78,7 +80,7 @@ export function _serialize(obj: any, options?: ISerializeOptions) {
           if (!allowCircular) {
             throw new Error('Circular reference detected');
           }
-          buffer += '"[Circular]"';
+          buffer += '"[Circular:' + visitedPath + ']"';
 
           return;
         }
@@ -108,7 +110,7 @@ export function _serialize(obj: any, options?: ISerializeOptions) {
         serialize(object[property], `${path}.${property}`);
       };
 
-      if (path === '' && vInclude) {
+      if (path === CircularRootPathName && vInclude) {
         vInclude.forEach((property) => {
           if (object.hasOwnProperty(property)) {
             addProp(property);

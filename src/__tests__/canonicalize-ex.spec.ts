@@ -64,7 +64,7 @@ describe('json canonicalize ex', () => {
     }
     obj.arr.push(obj.arr);
     expect(canonicalize(obj, {allowCircular: true})).toEqual(
-      '{"arr":[undefined,null,56,"a","12",{"a":123,"t":"455A"},"[Circular]"]}'
+      '{"arr":[undefined,null,56,"a","12",{"a":123,"t":"455A"},"[Circular:$.arr]"]}'
     )
   })
 
@@ -89,7 +89,7 @@ describe('json canonicalize ex', () => {
     obj.cir = obj;
     const result = canonicalize(obj, {allowCircular: true})
     expect(result).toEqual(
-      '{"arr":[56,"a","12",{"a":123,"t":"455A"}],"cir":"[Circular]","dt":"2018-12-17T01:08:19.719Z","num":47734.12,"text":undefined}'
+      '{"arr":[56,"a","12",{"a":123,"t":"455A"}],"cir":"[Circular:$]","dt":"2018-12-17T01:08:19.719Z","num":47734.12,"text":undefined}'
     )
 
   })

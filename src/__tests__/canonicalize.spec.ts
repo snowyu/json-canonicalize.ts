@@ -48,7 +48,7 @@ describe('json canonicalize', () => {
     }
     obj.arr.push(obj.arr);
     expect(canonicalize(obj, true)).toEqual(
-      '{"arr":[null,null,56,"a","12",{"a":123,"t":"455A"},"[Circular]"]}'
+      '{"arr":[null,null,56,"a","12",{"a":123,"t":"455A"},"[Circular:$.arr]"]}'
     )
   })
 
@@ -76,7 +76,7 @@ describe('json canonicalize', () => {
     }
     obj.cir = obj;
     expect(canonicalize(obj, true)).toEqual(
-      '{"arr":[56,"a","12",{"a":123,"t":"455A"}],"cir":"[Circular]","dt":"2018-12-17T01:08:19.719Z","num":47734.12}'
+      '{"arr":[56,"a","12",{"a":123,"t":"455A"}],"cir":"[Circular:$]","dt":"2018-12-17T01:08:19.719Z","num":47734.12}'
     )
 
   })
@@ -91,7 +91,7 @@ describe('json canonicalize', () => {
     obj.cir = obj;
     obj.arr.push(obj)
     expect(canonicalize(obj, true)).toEqual(
-      '{"arr":[56,"a","12",{"a":123,"t":"455A"},"[Circular]"],"cir":"[Circular]","dt":"2018-12-17T01:08:19.719Z","num":47734.12}'
+      '{"arr":[56,"a","12",{"a":123,"t":"455A"},"[Circular:$]"],"cir":"[Circular:$]","dt":"2018-12-17T01:08:19.719Z","num":47734.12}'
     )
 
   })
