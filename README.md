@@ -78,7 +78,7 @@ JSON.canonicalize(obj)
 This is the main function for JSON canonicalization. It takes a JavaScript object and returns its canonical string representation.
 
 -   `obj` (any): The JavaScript object to canonicalize.
--   `allowCircular` (boolean, optional): If `true`, the function will handle circular references in the object by replacing them with `null`. Defaults to `false`.
+-   `allowCircular` (boolean, optional): If `true`, the function will handle circular references in the object by replacing them with a special identifier (e.g., `[Circular:$.ref]`) that includes the `ref` item's origin, allowing for correct restoration of the object from the string. Defaults to `false`.
 
 ### `canonicalizeEx(obj, options)`
 
