@@ -55,7 +55,7 @@
     },
     "no-invalid-template-strings": true,
     "ordered-imports": true,
-    "prefer-template": true,
+    // "prefer-template": true,
     "newline-before-return": true,
     "match-default-export-name": true,
     "no-parameter-reassignment": false,
