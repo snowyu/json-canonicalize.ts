@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0](https://github.com/snowyu/json-canonicalize.ts/compare/v1.2.0...v2.0.0) (2025-06-29)
+
+
+### ⚠ BREAKING CHANGES
+
+* Update circular reference string format and tests
+
+### Bug Fixes
+
+* Update circular reference string format and tests ([5c14c52](https://github.com/snowyu/json-canonicalize.ts/commit/5c14c52cb6bdcb488ffd0e5ece81aa174f321f4a))
+
 ## [1.2.0](https://github.com/snowyu/json-canonicalize.ts/compare/v1.1.1...v1.2.0) (2025-06-28)
 
 
