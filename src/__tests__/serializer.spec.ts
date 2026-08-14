@@ -108,4 +108,26 @@ describe('_serialize', () => {
     expect(_serialize(true)).toBe('true');
     expect(_serialize(null)).toBe('null');
   });
+
+  it('should serialize negative zero as 0', () => {
+    expect(_serialize(-0)).toBe('0');
+  });
+
+  it('should throw an error for non-finite numbers', () => {
+    expect(() => _serialize(Infinity)).toThrow(
+      'Non-finite number (Infinity) is not permitted in JSON (RFC 8785 §3.2.2.3)'
+    );
+    expect(() => _serialize(-Infinity)).toThrow(
+      'Non-finite number (-Infinity) is not permitted in JSON (RFC 8785 §3.2.2.3)'
+    );
+    expect(() => _serialize(NaN)).toThrow(
+      'Non-finite number (NaN) is not permitted in JSON (RFC 8785 §3.2.2.3)'
+    );
+  });
+
+  it('should throw an error for non-finite numbers nested in objects and arrays', () => {
+    expect(() => _serialize({ v: Infinity })).toThrow('Non-finite number (Infinity)');
+    expect(() => _serialize([1, NaN, 3])).toThrow('Non-finite number (NaN)');
+    expect(() => _serialize({ a: { b: [NaN] } })).toThrow('Non-finite number (NaN)');
+  });
 });

@@ -35,6 +35,11 @@ export function _serialize(obj: any, options?: ISerializeOptions) {
       /////////////////////////////////////////////////
       // Primitive data type - Use ES6/JSON          //
       /////////////////////////////////////////////////
+      if (typeof object === 'number' && !Number.isFinite(object)) {
+        throw new Error(
+          `Non-finite number (${object}) is not permitted in JSON (RFC 8785 §3.2.2.3)`
+        );
+      }
       buffer += JSON.stringify(object);
 
     } else if (Array.isArray(object)) {

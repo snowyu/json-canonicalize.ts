@@ -48,6 +48,30 @@ To be fully compatible with RFC 8785, you can use the `canonicalizeEx` function 
 canonicalizeEx(obj, { undefinedInArrayToNull: false });
 ```
 
+## Non-finite numbers
+
+Per [RFC 8785 §3.2.2.3](https://www.rfc-editor.org/rfc/rfc8785#section-3.2.2.3), `NaN` and `Infinity` are not permitted in JSON: both `canonicalize` and `canonicalizeEx` throw an error when they encounter a non-finite number, instead of silently serializing it as `null`.
+
+Note that this also covers overflowing literals: `JSON.parse('{"v":1e400}')` overflows `1e400` to `Infinity` at parse time (there is no way for the serializer to recover the original literal), so canonicalizing such a document throws as well rather than producing a digest that collides with other overflowing values.
+
+### Intercepting overflow at parse time
+
+Since the overflow happens inside `JSON.parse`, the original literal is already lost by the time a value reaches the serializer. If you want to reject overflowing numbers at the boundary — before they enter your pipeline — parse with a reviver that checks `Number.isFinite`:
+
+```ts
+function parseRejectingNonFinite(text: string) {
+  return JSON.parse(text, (_key, value) => {
+    if (typeof value === 'number' && !Number.isFinite(value)) {
+      throw new Error(`Non-finite number (${value}) is not permitted in JSON (RFC 8785 §3.2.2.3)`);
+    }
+    return value;
+  });
+}
+
+parseRejectingNonFinite('{"v":1e400}'); // throws: Non-finite number (Infinity) is not permitted in JSON
+canonicalize(parseRejectingNonFinite('{"v":1e400}')); // never reaches canonicalize
+```
+
 ## 🔧 Installation
 
 ```sh

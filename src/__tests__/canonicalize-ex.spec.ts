@@ -120,4 +120,16 @@ describe('json canonicalize ex', () => {
     expect(canonicalize(obj)).toEqual('{"a":[1,2],"b":[1,2]}');
   });
 
+  it('should throw error when canonicalize non-finite numbers (RFC 8785 §3.2.2.3)', () => {
+    expect(() => canonicalize({ v: NaN })).toThrow(
+      'Non-finite number (NaN) is not permitted in JSON'
+    );
+    expect(() => canonicalize({ v: Infinity })).toThrow(
+      'Non-finite number (Infinity) is not permitted in JSON'
+    );
+    expect(() => canonicalize(JSON.parse('{"v":1e400}'))).toThrow(
+      'Non-finite number (Infinity) is not permitted in JSON'
+    );
+  })
+
 })
