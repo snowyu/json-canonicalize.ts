@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.0.0](https://github.com/snowyu/json-canonicalize.ts/compare/v2.0.1...v3.0.0) (2026-08-20)
+
+
+### ⚠ BREAKING CHANGES
+
+* modernize build system, add dual ESM/CJS support, fix #25
+
+### Features
+
+* modernize build system, add dual ESM/CJS support, fix [#25](https://github.com/snowyu/json-canonicalize.ts/issues/25) ([b6679e2](https://github.com/snowyu/json-canonicalize.ts/commit/b6679e22b09622456442ce3d13609659b6049510))
+
 ### [2.0.1](https://github.com/snowyu/json-canonicalize.ts/compare/v2.0.0...v2.0.1) (2026-08-14)
 
 
