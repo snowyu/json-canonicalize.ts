@@ -1,5 +1,3 @@
-// tslint:disable max-line-length
-// tslint:disable no-magic-numbers
 import { canonicalize } from '../canonicalize'
 
 describe('json canonicalize', () => {
