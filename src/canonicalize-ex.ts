@@ -1,4 +1,4 @@
-import { ISerializeOptions, _serialize } from './serializer';
+import { type ISerializeOptions, _serialize } from './serializer';
 
 /**
  * The extended canonicalization function, offering more granular control over the serialization process.
