@@ -118,6 +118,15 @@ describe('json canonicalize ex', () => {
     expect(canonicalize(obj)).toEqual('{"a":[1,2],"b":[1,2]}');
   });
 
+  it('should throw for undefined values when strictUndefined is true', () => {
+    expect(() =>
+      canonicalize({ text: undefined }, { strictUndefined: true })
+    ).toThrow('undefined is not permitted in JSON at "$.text" (strictUndefined)');
+    expect(() =>
+      canonicalize([1, undefined, 3], { strictUndefined: true })
+    ).toThrow('undefined is not permitted in JSON at "$[1]" (strictUndefined)');
+  })
+
   it('should throw error when canonicalize non-finite numbers (RFC 8785 §3.2.2.3)', () => {
     expect(() => canonicalize({ v: NaN })).toThrow(
       'Non-finite number (NaN) is not permitted in JSON'

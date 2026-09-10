@@ -31,6 +31,42 @@ describe('_serialize', () => {
     expect(_serialize(obj, { undefinedInArrayToNull: false })).toBe('[1,undefined,3]');
   });
 
+  it('should throw for undefined object property when strictUndefined is true', () => {
+    const obj = { a: 1, b: undefined };
+    expect(() => _serialize(obj, { strictUndefined: true })).toThrow(
+      'undefined is not permitted in JSON at "$.b" (strictUndefined)'
+    );
+  });
+
+  it('should throw for undefined array element when strictUndefined is true', () => {
+    const obj = [1, undefined, 3];
+    expect(() => _serialize(obj, { strictUndefined: true })).toThrow(
+      'undefined is not permitted in JSON at "$[1]" (strictUndefined)'
+    );
+  });
+
+  it('should throw for a top-level undefined input when strictUndefined is true', () => {
+    expect(() => _serialize(undefined, { strictUndefined: true })).toThrow(
+      'undefined is not permitted in JSON at "$" (strictUndefined)'
+    );
+  });
+
+  it('should throw before filtering/converting when strictUndefined is true (takes precedence)', () => {
+    const obj = { a: undefined, b: [undefined] };
+    expect(() =>
+      _serialize(obj, {
+        strictUndefined: true,
+        filterUndefined: true,
+        undefinedInArrayToNull: true,
+      })
+    ).toThrow('undefined is not permitted in JSON');
+  });
+
+  it('should not throw for undefined when strictUndefined is not set', () => {
+    expect(_serialize({ a: undefined }, { filterUndefined: false })).toBe('{"a":undefined}');
+    expect(_serialize([undefined], {})).toBe('[undefined]');
+  });
+
   it('should throw an error for circular references by default', () => {
     const obj: any = {};
     obj.a = obj;

@@ -37,15 +37,31 @@ The JSON Canonicalization Scheme concept in a nutshell:
 
 ## RFC 8785 Compatibility
 
-This implementation is compatible with JCS / RFC 8785, with a couple of key differences in the default `canonicalize` function:
+This implementation is compatible with JCS / RFC 8785 for all data that can actually be represented in JSON, with two enhancements on top:
 
-- **Handling of `undefined` in arrays:** When a value in an array is `undefined`, the `canonicalize` function treats it as `null`. RFC 8785 specifies that it should be treated as `undefined`, which can lead to different outputs.
-- **Recursive References:** This implementation supports recursive object references, which is an enhancement not covered by the standard.
+- **Recursive References:** circular references can be handled (replaced by a `[Circular:$.path]` marker) instead of aborting, which the standard does not cover.
+- **Extra filtering:** `canonicalize` drops `undefined` object properties and converts `undefined` array items to `null` (see below).
 
-To be fully compatible with RFC 8785, you can use the `canonicalizeEx` function with the `undefinedInArrayToNull` option set to `false`:
+### A note on `undefined`
+
+`undefined` does not exist in JSON. The JSON data model ([RFC 8259](https://www.rfc-editor.org/rfc/rfc8259#section-1)) defines only object, array, string, number, `true`, `false`, and `null`, and RFC 8785 constrains the input to the I-JSON subset. As a JavaScript value, `undefined` only exists *before* serialization, so the RFC does not — and cannot — define how it should be serialized.
+
+The only observable "reference behavior" is the sample code in [RFC 8785 Appendix A](https://www.rfc-editor.org/rfc/rfc8785#appendix-a), which intentionally skips error handling and blindly leaks `undefined` into its output — e.g. `[1,undefined,3]`, which is invalid, unparseable JSON.
+
+Instead of emitting invalid JSON, the default `canonicalize` follows the ECMAScript `JSON.stringify` conventions — the same conventions RFC 8785 builds on for every other primitive ([§3.2.2](https://www.rfc-editor.org/rfc/rfc8785#section-3.2.2)):
+
+| Input | `canonicalize` | `JSON.stringify` (ES convention) | RFC 8785 App. A sample |
+| --- | --- | --- | --- |
+| `{ a: 1, b: undefined }` | `{"a":1}` | `{"a":1}` | `{"a":1,"b":undefined}` |
+| `[1, undefined, 3]` | `[1,null,3]` | `[1,null,3]` | `[1,undefined,3]` |
+
+- `undefined` **object properties** → dropped (`filterUndefined`)
+- `undefined` **array items** → serialized as `null` (`undefinedInArrayToNull`)
+
+For the most RFC 8785-faithful behavior, use `canonicalizeEx` with `strictUndefined: true`: any `undefined` value terminates with an error, just like `NaN`/`Infinity` already do ([§3.2.2.3](https://www.rfc-editor.org/rfc/rfc8785#section-3.2.2.3)). With neither `undefined` option set, `canonicalizeEx` passes values through and reproduces the Appendix A sample output byte-for-byte (invalid `undefined` tokens included), which is mainly useful for testing against the reference implementation.
 
 ```ts
-canonicalizeEx(obj, { undefinedInArrayToNull: false });
+canonicalizeEx(obj, { strictUndefined: true }); // throws on any undefined
 ```
 
 ## Non-finite numbers
@@ -72,10 +88,60 @@ parseRejectingNonFinite('{"v":1e400}'); // throws: Non-finite number (Infinity) 
 canonicalize(parseRejectingNonFinite('{"v":1e400}')); // never reaches canonicalize
 ```
 
+## `canonicalize` vs `canonicalizeEx`
+
+|  | `canonicalize(obj, allowCircular?)` | `canonicalizeEx(obj, options?)` |
+| --- | --- | --- |
+| Purpose | RFC 8785 + ECMAScript `JSON.stringify` conventions, zero config | Full control over filtering, strictness, and circular handling |
+| `undefined` object properties | dropped | kept unless `filterUndefined: true`; error with `strictUndefined: true` |
+| `undefined` array items | serialized as `null` | kept unless `undefinedInArrayToNull: true`; error with `strictUndefined: true` |
+| Circular references | `allowCircular` parameter | `allowCircular` option |
+| `include` / `exclude` filtering | — | ✅ |
+
+### Filtering with `include` / `exclude`
+
+`exclude` accepts a string or an array of property names and applies **recursively at every object level**; `include` is a **root-level whitelist** — missing names are silently skipped, and nested objects are serialized in full:
+
+```ts
+import { canonicalize, canonicalizeEx } from 'json-canonicalize'
+
+const obj = {
+  text: '你好',
+  num: 47734.12,
+  dt: new Date('2018-12-17T01:08:19.719Z'),
+  arr: [56, 'a', '12', { t: '455A', a: 123 }],
+}
+
+// exclude: a string or an array, applied at every nesting level
+canonicalizeEx(obj, { exclude: 'num' })
+// '{"arr":[56,"a","12",{"a":123,"t":"455A"}],"dt":"2018-12-17T01:08:19.719Z","text":"你好"}'
+
+canonicalizeEx(obj, { exclude: ['num', 'dt'] })
+// '{"arr":[56,"a","12",{"a":123,"t":"455A"}],"text":"你好"}'
+
+// include: root-level whitelist, output sorted as always
+canonicalizeEx(obj, { include: ['text', 'arr'] })
+// '{"arr":[56,"a","12",{"a":123,"t":"455A"}],"text":"你好"}'
+
+// include selects root properties only; nested objects are kept whole
+canonicalizeEx({ a: { b: 1, c: 2 } }, { include: ['a'] })
+// '{"a":{"b":1,"c":2}}'
+
+// combining both: exclude wins over include
+canonicalizeEx({ a: 1, b: 2 }, { include: ['a', 'b'], exclude: 'a' })
+// '{"b":2}'
+```
+
+Notes:
+
+- While `include` is active, `filterUndefined` is not applied to the whitelisted root properties — an included property with an `undefined` value is emitted (or, with `strictUndefined: true`, throws).
+- Properties removed by `exclude` are not validated at all: with `strictUndefined: true`, an `undefined` value hiding under an excluded property does not throw.
+- For signing/hashing, prefer plain `canonicalize` — `include`/`exclude` produce non-canonical output by definition, so only use them for view-model or logging purposes.
+
 ## 🔧 Installation
 
 ```sh
-yarn add json-canonicalize
+npm add json-canonicalize
 ```
 
 ## 🎬 Getting started
@@ -109,10 +175,11 @@ This is the main function for JSON canonicalization. It takes a JavaScript objec
 This is the extended canonicalization function, offering more granular control over the serialization process.
 
 -   `obj` (any): The JavaScript object to canonicalize.
--   `options` (ISerializeOptions, optional): An object with the following properties:
+-   `options` (ISerializeOptions, optional): An object with the following properties. Note that `canonicalizeEx` passes options through to the serializer unmodified — only the options actually present are applied (the default `canonicalize` is the one that enables `filterUndefined` and `undefinedInArrayToNull`):
     -   `allowCircular` (boolean, optional): Same as in `canonicalize`.
-    -   `filterUndefined` (boolean, optional): If `true`, `undefined` values in objects will be filtered out. Defaults to `true`.
-    -   `undefinedInArrayToNull` (boolean, optional): If `true`, `undefined` values in arrays will be converted to `null`. Defaults to `true`.
+    -   `filterUndefined` (boolean, optional): If `true`, `undefined` values in objects will be filtered out.
+    -   `undefinedInArrayToNull` (boolean, optional): If `true`, `undefined` values in arrays will be converted to `null`.
+    -   `strictUndefined` (boolean, optional): If `true`, any `undefined` value terminates with an error instead (takes precedence over the two options above).
     -   `include` (string[], optional): An array of property names to include in the canonicalization.
     -   `exclude` (string[], optional): An array of property names to exclude from the canonicalization.
 
