@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.0.1](https://github.com/snowyu/json-canonicalize.ts/compare/v3.0.0...v3.0.1) (2026-09-10)
+
+
+### Bug Fixes
+
+* add strictUndefined option and clarify undefined handling in RFC 8785 ([ef0471e](https://github.com/snowyu/json-canonicalize.ts/commit/ef0471eb36fa572f606f8dd5a949e46cf1d369f4))
+* **ts:** Imports "ISerializeOptions" are only used as type ([17faf0e](https://github.com/snowyu/json-canonicalize.ts/commit/17faf0ed04256c1cb7a5c6ce7fae513995b25b5e))
+
 ## [3.0.0](https://github.com/snowyu/json-canonicalize.ts/compare/v2.0.1...v3.0.0) (2026-08-20)
 
 
