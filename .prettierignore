@@ -1,2 +1,4 @@
 node_modules
 dist
+# Byte-exact RFC 8785 vectors: Prettier must not touch them
+src/__tests__/jcs-vectors/**
