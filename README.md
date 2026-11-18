@@ -88,6 +88,10 @@ parseRejectingNonFinite('{"v":1e400}'); // throws: Non-finite number (Infinity) 
 canonicalize(parseRejectingNonFinite('{"v":1e400}')); // never reaches canonicalize
 ```
 
+## Unpaired surrogates
+
+Currently, `canonicalize` serializes an unpaired UTF-16 surrogate as a `\u` escape, for example `{ a: '\uD83D' }` becomes `{"a":"\ud83d"}`. RFC 8785 §3.2.2.2 requires an error for this invalid Unicode data, so this is a known compatibility gap. The default behavior is covered by the vector tests and tracked separately in [issue #30](https://github.com/snowyu/json-canonicalize.ts/issues/30).
+
 ## `canonicalize` vs `canonicalizeEx`
 
 |  | `canonicalize(obj, allowCircular?)` | `canonicalizeEx(obj, options?)` |

@@ -1,0 +1,3 @@
+# Byte-exact vendored RFC 8785 vectors: never convert line endings, never render as a diff
+src/__tests__/jcs-vectors/** -text linguist-vendored
+src/__tests__/jcs-vectors/numbers.jsonl -diff linguist-generated
